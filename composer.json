@@ -1,0 +1,21 @@
+{
+    "name": "myoutdesk/prismapi",
+    "description": "API for PrismHR",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^7.2",
+        "league/csv": "^8.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JL",
+            "email": "jl@myoutdesk.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Myoutdesk\\PrismApi\\": "src/"
+        }
+    }
+}
