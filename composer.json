@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "guzzlehttp/guzzle": "^7.2",
-        "league/csv": "^8.0"
+        "league/csv": "^9.6"
     },
     "license": "MIT",
     "authors": [
