@@ -49,6 +49,8 @@ class PayrollService
         if(empty($clientId)) {
             throw new \InvalidArgumentException('Client ID cannot be empty');
         }
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = $endDate->format('Y-m-d');
         try {
             $batches = $this->decodeRestResponse($this->executeGetBatchListByDate($startDate, $endDate, $clientId))['batchList'];
             // The server responds when creating with "batchNum" but when querying it's called "batchId" instead
