@@ -52,9 +52,7 @@ class PayrollService
         $startDate = $startDate->format('Y-m-d');
         $endDate = $endDate->format('Y-m-d');
         try {
-            $batches = $this->decodeRestResponse($this->executeGetBatchListByDate($startDate, $endDate, $clientId))['batchList'];
-            // The server responds when creating with "batchNum" but when querying it's called "batchId" instead
-            return $batches[0]['batchId'];
+            return $this->decodeRestResponse($this->executeGetBatchListByDate($startDate, $endDate, $clientId))['batchList'];
         } catch (ClientException $exception) {
             $response = $exception->getResponse();
             $status = $response->getStatusCode();
@@ -87,7 +85,7 @@ class PayrollService
         try {
             $batches = $this->decodeRestResponse($this->executeGetBatchListByDate($startDate, $endDate, $clientId))['batchList'];
             // The server responds when creating with "batchNum" but when querying it's called "batchId" instead
-            return $batches['batchId'];
+            return $batches[0]['batchId'];
         } catch (ClientException $exception) {
             $response = $exception->getResponse();
             $status = $response->getStatusCode();
