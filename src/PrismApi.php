@@ -124,6 +124,27 @@ class PrismApi
         return $firstFoundBatch;
     }
 
+    /**
+     * Returns the payroll batches between the given dates
+     *
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @param string $clientId
+     */
+    public function getPayrollBatches(\DateTimeInterface $startDate, \DateTimeInterface $endDate, string $clientId)
+    {
+        $payrollService = new PayrollService($this->client);
+        return $payrollService->getBatchListByDateRange($startDate, $endDate, $clientId);
+    }
+
+    /**
+     * Returns the payroll batch with the given id
+     *
+     * @param string $batchId
+     * @param string $clientId
+     * @return array|mixed
+     * @throws Exceptions\ApiException
+     */
     public function getPayrollBatch(string $batchId, string $clientId)
     {
         $payrollService = new PayrollService($this->client);

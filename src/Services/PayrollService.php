@@ -35,6 +35,38 @@ class PayrollService
     }
 
     /**
+     * Returns the payroll batches between the start date, end date
+     *
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @param string $clientId
+     * @return array|mixed
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getBatchListByDateRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate, string $clientId)
+    {
+        if(empty($clientId)) {
+            throw new \InvalidArgumentException('Client ID cannot be empty');
+        }
+        try {
+            $batches = $this->decodeRestResponse($this->executeGetBatchListByDate($startDate, $endDate, $clientId))['batchList'];
+            // The server responds when creating with "batchNum" but when querying it's called "batchId" instead
+            return $batches[0]['batchId'];
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
+            $status = $response->getStatusCode();
+            // If none exist, just return an empty array instead of a 404 error
+            if($status === 404) {
+                return [];
+            }
+            throw new ApiException(
+                "Received $status: '{$response->getBody()}' when authenticating with API."
+            );
+        }
+    }
+
+    /**
      * Returns the first batchlist found for a given date, client OR creates one
      *
      * @param \DateTimeInterface $date
