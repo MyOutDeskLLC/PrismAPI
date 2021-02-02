@@ -87,7 +87,7 @@ class PayrollService
         try {
             $batches = $this->decodeRestResponse($this->executeGetBatchListByDate($startDate, $endDate, $clientId))['batchList'];
             // The server responds when creating with "batchNum" but when querying it's called "batchId" instead
-            return $batches[0]['batchId'];
+            return $batches['batchId'];
         } catch (ClientException $exception) {
             $response = $exception->getResponse();
             $status = $response->getStatusCode();
