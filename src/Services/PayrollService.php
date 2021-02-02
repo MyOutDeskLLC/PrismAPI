@@ -99,6 +99,29 @@ class PayrollService
         }
     }
 
+    public function getEmployeesForBatch(string $batchId, string $clientId)
+    {
+        if(empty($clientId)) {
+            throw new \InvalidArgumentException('Client ID cannot be empty');
+        }
+        if(empty($batchId)) {
+            throw new \InvalidArgumentException('Client ID cannot be empty');
+        }
+        try {
+            return $this->decodeRestResponse($this->executeGetEmployeeListByBatch($batchId, $clientId))['employeeIdList']['employeeId'];
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
+            $status = $response->getStatusCode();
+            // If none exist, just return an empty array instead of a 404 error
+            if($status === 404) {
+                return [];
+            }
+            throw new ApiException(
+                "Received $status: '{$response->getBody()}' when authenticating with API."
+            );
+        }
+    }
+
     public function getPayrollBatch(string $batchId, string $clientId)
     {
         if(empty($clientId)) {
@@ -218,6 +241,24 @@ class PayrollService
                 'endDate' => $endDate,
                 'clientId' => $clientId,
                 'dateType' => 'PAY'
+            ]
+        ]);
+    }
+
+    /**
+     * Gets a list of employees by batch date
+     *
+     * @param string $batchId
+     * @param string $clientId
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function executeGetEmployeeListByBatch(string $batchId, string $clientId)
+    {
+        return $this->client->request('GET', 'payroll/getEmployeeForBatch', [
+            'query' => [
+                'batchId' => $batchId,
+                'clientId' => $clientId
             ]
         ]);
     }

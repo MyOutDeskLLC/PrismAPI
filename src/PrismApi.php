@@ -89,6 +89,18 @@ class PrismApi
         return $employeeService->getEmployees($id, $clientId);
     }
 
+    /**
+     * Returns all employees in a given payroll batch (by their prism id)
+     *
+     * @param string $batchId
+     * @param string $clientId
+     */
+    public function getEmployeesInPayrollBatch(string $batchId, string $clientId)
+    {
+        $payrollService = new PayrollService($this->client);
+        return $payrollService->getEmployeesForBatch($batchId, $clientId);
+    }
+
 
     /**
      * Returns a list of employees this user account can access
