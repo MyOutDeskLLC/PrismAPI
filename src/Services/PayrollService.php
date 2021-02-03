@@ -145,9 +145,43 @@ class PayrollService
         }
     }
 
+    /**
+     * Updates the employees in a given payroll batch
+     *
+     * @param string $batchId
+     * @param string $clientId
+     * @param array $employees
+     * @param $originalBatch
+     * @return array|mixed
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function updateEmployeesForPayrollBatch(string $batchId, string $clientId, array $employees, $originalBatch)
+    {
+        if(empty($clientId)) {
+            throw new \InvalidArgumentException('$clientId cannot be empty');
+        }
+        if(empty($batchId)) {
+            throw new \InvalidArgumentException('$batchId cannot be empty');
+        }
+        try {
+            return $this->decodeRestResponse($this->executeUpdateEmployeesInBatch($batchId, $clientId, $employees, $originalBatch));
+        } catch (ClientException $exception) {
+            $response = $exception->getResponse();
+            $status = $response->getStatusCode();
+            // If none exist, just return an empty array instead of a 404 error
+            if($status === 404) {
+                return [];
+            }
+            throw new ApiException(
+                "Received $status: '{$response->getBody()}' when authenticating with API."
+            );
+        }
+    }
+
     public function executeGetBatchInfo(string $clientId, string $batchId)
     {
-        return $this->client->request('GET', 'payroll/getBatchInfo', [
+        return $this->client->request('GET', 'payroll/getPayrollBatchWithOptions', [
             'query' => [
                 'clientId' => $clientId,
                 'batchId' => $batchId
@@ -259,6 +293,53 @@ class PayrollService
             'query' => [
                 'batchId' => $batchId,
                 'clientId' => $clientId
+            ]
+        ]);
+    }
+
+    /**
+     * Updates the employees present in a manual batch
+     *
+     * @param string $batchId
+     * @param string $clientId
+     * @param array $employees
+     * @param $originalBatch
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function executeUpdateEmployeesInBatch(string $batchId, string $clientId, array $employees, $originalBatch)
+    {
+        $checksum = $originalBatch['batchControl']['checksum'];
+        $periodStart = $originalBatch['batchControl']['manualBatch'][0]['periodStart'];
+        $periodEnd = $originalBatch['batchControl']['manualBatch'][0]['periodEnd'];
+        $weeksWorked = $originalBatch['batchControl']['manualBatch'][0]['weeksWorked'];
+        $deductPeriod = $originalBatch['batchControl']['manualBatch'][0]['deductPeriod'];
+        $processor = $originalBatch['batchControl']['processor'];
+
+        $employeeData = [];
+        foreach($employees as $employee) {
+            $employeeData[] = [
+                'employeeId' => $employee,
+                'periodStart' => $periodStart,
+                'periodEnd' => $periodEnd,
+                'weeksWorked' => $weeksWorked,
+                'deductPeriod' => $deductPeriod
+            ];
+        }
+
+        return $this->client->request('POST', 'payroll/updatePayrollBatchWithOptions', [
+            'json' => [
+                'clientId' => $clientId,
+                'batchControl' => [
+                    'checksum' => $checksum,
+                    'batchId' => $batchId,
+                    'batchType' => 'M',
+                    'processor' => $processor,
+                    'payDate' => $originalBatch['batchControl']['payDate'],
+                    'remoteCutoffDate' => $originalBatch['batchControl']['remoteCutoffDate'],
+                    'deliveryDate' => $originalBatch['batchControl']['deliveryDate'],
+                    'manualBatch' => $employeeData
+                ]
             ]
         ]);
     }

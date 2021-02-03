@@ -33,6 +33,26 @@ class PrismApi
     }
 
     /**
+     * Returns the payroll service for direct use
+     *
+     * @return PayrollService
+     */
+    public function getPayrollService()
+    {
+        return new PayrollService($this->client);
+    }
+
+    /**
+     * Returns the timesheet upload service for direct use
+     *
+     * @return TimesheetUploadService
+     */
+    public function getTimesheetUploadService()
+    {
+        return new TimesheetUploadService($this->client);
+    }
+
+    /**
      * Authenticates the user specified and updates headers
      *
      * @param $username string
@@ -99,6 +119,23 @@ class PrismApi
     {
         $payrollService = new PayrollService($this->client);
         return $payrollService->getEmployeesForBatch($batchId, $clientId);
+    }
+
+    /**
+     * Updates employees in the given payroll batch
+     *
+     * @param string $batchId
+     * @param string $clientId
+     * @param array $employees
+     * @return array|mixed
+     * @throws Exceptions\ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function updateEmployeesInPayrollBatch(string $batchId, string $clientId, array $employees)
+    {
+        $payrollService = new PayrollService($this->client);
+        $batchInfo = $this->getPayrollBatch($batchId, $clientId);
+        return $payrollService->updateEmployeesForPayrollBatch($batchId, $clientId, $employees, $batchInfo);
     }
 
 
