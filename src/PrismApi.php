@@ -155,20 +155,22 @@ class PrismApi
     /**
      * Attempts to locate an MTI created batch in Prism or creates one
      *
-     * @param \DateTimeInterface $date
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
      * @param string $clientId
      * @param array $employeeIds
      *
      * @return string the ID of the batch found or created
      *
      * @throws Exceptions\ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function findOrCreatePayrollBatch(\DateTimeInterface $date, string $clientId, array $employeeIds)
+    public function findOrCreatePayrollBatch(\DateTimeInterface $startDate, \DateTimeInterface $endDate, string $clientId, array $employeeIds)
     {
         $payrollService = new PayrollService($this->client);
-        $firstFoundBatch = $payrollService->getBatchListByDate($date, $clientId);
+        $firstFoundBatch = $payrollService->getBatchListByDate($startDate, $clientId);
         if(empty($firstFoundBatch)) {
-            return $payrollService->createBatch($date, $clientId, $employeeIds);
+            return $payrollService->createBatch($startDate, $endDate, $clientId, $employeeIds);
         }
         return $firstFoundBatch;
     }

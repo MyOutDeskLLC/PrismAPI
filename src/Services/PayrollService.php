@@ -192,13 +192,15 @@ class PayrollService
     /**
      * Creates a given payroll batch to upload timesheets against. Requires employee ID's be set.
      *
-     * @param \DateTimeInterface $date
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
      * @param string $clientId
      * @param array $employeeIds
      * @return mixed
      * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createBatch(\DateTimeInterface $date, string $clientId, array $employeeIds)
+    public function createBatch(\DateTimeInterface $startDate, \DateTimeInterface $endDate, string $clientId, array $employeeIds)
     {
         if(empty($clientId)) {
             throw new \InvalidArgumentException('Client ID cannot be empty');
@@ -206,9 +208,7 @@ class PayrollService
         if(empty($employeeIds)) {
             throw new \InvalidArgumentException('At least 1 employee must be specified');
         }
-        $endDate = clone $date;
-        $startDate = $date->format('Y-m-d');
-        $endDate->modify('+1 week');
+        $startDate = $startDate->format('Y-m-d');
         $endDate = $endDate->format('Y-m-d');
         try {
             $response = $this->decodeRestResponse($this->executeCreateBatch($startDate, $endDate, $clientId, $employeeIds));
