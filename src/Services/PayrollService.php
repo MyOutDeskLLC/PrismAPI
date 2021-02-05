@@ -194,13 +194,14 @@ class PayrollService
      *
      * @param \DateTimeInterface $startDate
      * @param \DateTimeInterface $endDate
+     * @param \DateTimeInterface $payDate
      * @param string $clientId
      * @param array $employeeIds
      * @return mixed
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createBatch(\DateTimeInterface $startDate, \DateTimeInterface $endDate, string $clientId, array $employeeIds)
+    public function createBatch(\DateTimeInterface $startDate, \DateTimeInterface $endDate, \DateTimeInterface $payDate, string $clientId, array $employeeIds)
     {
         if(empty($clientId)) {
             throw new \InvalidArgumentException('Client ID cannot be empty');
@@ -211,7 +212,7 @@ class PayrollService
         $startDate = $startDate->format('Y-m-d');
         $endDate = $endDate->format('Y-m-d');
         try {
-            $response = $this->decodeRestResponse($this->executeCreateBatch($startDate, $endDate, $clientId, $employeeIds));
+            $response = $this->decodeRestResponse($this->executeCreateBatch($startDate, $endDate, $payDate, $clientId, $employeeIds));
             return $response['batchNum'];
         } catch (ClientException $exception) {
             $response = $exception->getResponse();
@@ -233,12 +234,13 @@ class PayrollService
      *
      * @param $startDate
      * @param $endDate
+     * @param $payDate
      * @param $clientId
      * @param $employeeIds
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function executeCreateBatch($startDate, $endDate, $clientId, $employeeIds)
+    public function executeCreateBatch($startDate, $endDate, $payDate, $clientId, $employeeIds)
     {
         $employeeData = [];
         foreach($employeeIds as $employee) {
@@ -251,7 +253,7 @@ class PayrollService
         return $this->client->request('POST', 'payroll/createPayrollBatches', [
             'json' => [
                 'clientId' => $clientId,
-                'payDate' => $endDate,
+                'payDate' => $payDate,
                 'batchType' => 'M',
                 'employee' => $employeeData
             ]

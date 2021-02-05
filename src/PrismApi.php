@@ -300,16 +300,17 @@ class PrismApi
      *
      * @param \DateTimeInterface $startDate
      * @param \DateTimeInterface $endDate
+     * @param \DateTimeInterface $payDate
      * @param string $clientId the client(company) specified - example: 1111 for DEMO
      * @param array $employeeIds the employee ID's eligible to be put into this batch
      * @return string the ID of the batch created
      * @throws Exceptions\ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createPayrollBatch(\DateTimeInterface $startDate, \DateTimeInterface $endDate, string $clientId, array $employeeIds)
+    public function createPayrollBatch(\DateTimeInterface $startDate, \DateTimeInterface $endDate, \DateTimeInterface $payDate, string $clientId, array $employeeIds)
     {
         $payrollService = new PayrollService($this->client);
-        return $payrollService->createBatch($startDate, $endDate, $clientId, $employeeIds);
+        return $payrollService->createBatch($startDate, $endDate, $payDate, $clientId, $employeeIds);
     }
 
     /**
