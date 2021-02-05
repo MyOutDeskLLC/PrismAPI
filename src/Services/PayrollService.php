@@ -313,7 +313,7 @@ class PayrollService
         $periodStart = $originalBatch['batchControl']['manualBatch'][0]['periodStart'];
         $periodEnd = $originalBatch['batchControl']['manualBatch'][0]['periodEnd'];
         $weeksWorked = $originalBatch['batchControl']['manualBatch'][0]['weeksWorked'];
-        $deductPeriod = $originalBatch['batchControl']['manualBatch'][0]['deductPeriod'];
+        $deductPeriod = (int)$originalBatch['batchControl']['manualBatch'][0]['deductPeriod'];
         $processor = $originalBatch['batchControl']['processor'];
 
         $employeeData = [];
@@ -323,7 +323,7 @@ class PayrollService
                 'periodStart' => $periodStart,
                 'periodEnd' => $periodEnd,
                 'weeksWorked' => $weeksWorked,
-                'deductPeriod' => $deductPeriod
+                'deductPeriod' => $deductPeriod > 0 ? $deductPeriod : 1
             ];
         }
 
