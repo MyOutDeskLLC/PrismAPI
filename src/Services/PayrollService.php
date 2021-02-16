@@ -211,6 +211,7 @@ class PayrollService
         }
         $startDate = $startDate->format('Y-m-d');
         $endDate = $endDate->format('Y-m-d');
+        $payDate = $payDate->format('Y-m-d');
         try {
             $response = $this->decodeRestResponse($this->executeCreateBatch($startDate, $endDate, $payDate, $clientId, $employeeIds));
             return $response['batchNum'];
